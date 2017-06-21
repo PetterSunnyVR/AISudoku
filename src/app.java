@@ -8,6 +8,16 @@ public class app {
 		Utils utils = new Utils(sudoku);
 		//utils.getValuesAfterElimination("H7");
 		//sudoku.getLines("I7");
+/*		System.out.println(sudoku.returnEmptyPositionCounter());
 		utils.createTreeOfSolutions();
+		System.out.println(sudoku.returnEmptyPositionCounter());*/
+		int counter = 0;
+		while(sudoku.returnEmptyPositionCounter()>0){
+			utils.createTreeOfSolutions();
+			counter++;
+		}
+		System.out.println(counter);
+		//utils.onlyChoiceSolutionBox("I9");
+		
 	}
 }

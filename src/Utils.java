@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class Utils {
@@ -11,7 +12,7 @@ public class Utils {
 	private int[] boxValues3 = {6,7,8};
 	
 	//hashmap storing all the possible values that can be solutions for each empty position in sudoku
-	private HashMap<int[], ArrayList<Integer>> possibleSolutionsMap = new HashMap<>();
+	private Map<String, ArrayList<Integer>> possibleSolutionsMap = new HashMap<>();
 	
 	
 	public Utils(Board board) {
@@ -193,20 +194,24 @@ public class Utils {
 			}
 				
 		}
-		System.out.println("["+row+"]["+col+"]"+tempList.toString());
+
 		return tempList;
 		
 	}
 	
 	public void createTreeOfSolutions() {
+		ArrayList<Integer> tempArray;
 		for(int i = 0; i<9; i++) {
 			for(int j = 0; j<9; j++) {
 				if(board.getPositionValue(i, j)==(-1)) {
-					ArrayList<Integer> tempArray = this.getValuesAfterElimination(i, j);
+					tempArray = this.getValuesAfterElimination(i, j);
+					//System.out.println("["+i+"]["+j+"]"+tempArray.toString());
 					if(tempArray.size()==1) {
 						board.setBoardValue(i, j, tempArray.get(0));
+						board.reduceEmptyPositionCounter();
 					}else {
-						possibleSolutionsMap.put(new int[]{i,j},tempArray);	
+						possibleSolutionsMap.put(i+""+j+"",tempArray);
+
 					}
 					
 				}
@@ -217,7 +222,35 @@ public class Utils {
 		board.printBoard();
 	}
 	
-	public void onlyChoiceSolutionBox() {
+	public void onlyChoiceSolutionBox(String position) {
+		System.out.println("!!!"+position);
+		String[] tempBox = getBox(position);
+		int[] index2D = board.getPositionIndex2D(position);
+		System.out.println("!!"+index2D[0]+index2D[1]);
+		ArrayList<Integer> tempValueList = new ArrayList<>(Arrays.asList(1,2,3,4,5,6,7,8,9));
+		ArrayList<Integer> repeateValueList = new ArrayList<>();
+		if(board.getPositionValue(position)==(-1)){
+			//System.out.print(possibleSolutionsMap.get(index2D).toString());
+			System.out.println(index2D[0]+""+index2D[1]+" "+possibleSolutionsMap.get(index2D[0]+index2D[1]+""));
+		}else{
+			tempValueList.remove(board.getPositionValue(position));
+		}
+		for(int i =0; i< tempBox.length; i++){
+			if(board.getPositionValue(Integer.parseInt(tempBox[i].substring(0, 1)),Integer.parseInt(tempBox[i].substring(1)))==(-1)){
+				System.out.print(tempBox[i]+" "+possibleSolutionsMap.get(tempBox[i]+"")+" ");
+				for(Integer val : possibleSolutionsMap.get(tempBox[i]+"")){
+					if(repeateValueList.contains(val)){
+						tempValueList.remove(val);
+					}else{
+						repeateValueList.add(val);
+					}
+				}
+			}else{
+				//System.out.println(tempValueList.contains(board.getPositionValue(Integer.parseInt(tempBox[i].substring(0, 1)),Integer.parseInt(tempBox[i].substring(1)))));
+				//tempValueList.remove(board.getPositionValue(Integer.parseInt(tempBox[i].substring(0, 1)),Integer.parseInt(tempBox[i].substring(1))));
+			}
+		}
 		
+		System.out.println("ARR "+tempValueList.toString());
 	}
 }

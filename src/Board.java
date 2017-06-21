@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 public class Board {
 	
 	private int[][] board = new int[9][9]; 
-	
+	private int emptyPositions = 0;
 	public Board() {
 		// TODO Auto-generated constructor stub
 	}
@@ -26,6 +26,7 @@ public class Board {
 							board[k][i]=Integer.parseInt(values.substring(i+9*k, i+9*k+1));
 						}else{
 							board[k][i]=-1;
+							emptyPositions++;
 						}
 					}else{
 						return false;
@@ -99,5 +100,13 @@ public class Board {
 	
 	public void setBoardValue(int row, int col, int value) {
 		board[row][col] = value;
+	}
+	
+	public void reduceEmptyPositionCounter(){
+		emptyPositions--;
+	}
+	
+	public int returnEmptyPositionCounter(){
+		return emptyPositions;
 	}
 }
