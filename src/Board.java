@@ -42,6 +42,10 @@ public class Board {
 	public int[][] getBoard() {
 		return board;
 	}
+	
+	public void setBoard(int[][] board) {
+		this.board = board;
+	}
 	public void printBoard(){
 		for(int k=0; k<9; k++){
 			for(int i=0; i<9; i++){
@@ -108,5 +112,13 @@ public class Board {
 	
 	public int returnEmptyPositionCounter(){
 		return emptyPositions;
+	}
+	
+	public int getEmptyPositions() {
+		return emptyPositions;
+	}
+	
+	public void setEmptyPositions(int emptyPositions) {
+		this.emptyPositions=emptyPositions;
 	}
 }

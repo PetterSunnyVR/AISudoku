@@ -12,6 +12,8 @@ public class Utils {
 	private int[] boxValues1 = {0,1,2};
 	private int[] boxValues2 = {3,4,5};
 	private int[] boxValues3 = {6,7,8};
+	private int currentUnsolved = 81,afterUnsolved=81;
+	private int counter = 0;
 	
 	//hashmap storing all the possible values that can be solutions for each empty position in sudoku
 	private Map<String, ArrayList<Integer>> possibleSolutionsMap = new HashMap<>();
@@ -19,6 +21,14 @@ public class Utils {
 	
 	public Utils(Board board) {
 		this.board = board;
+	}
+	
+	public Map<String, ArrayList<Integer>> getPossibleSolutionsMap(){
+		return possibleSolutionsMap;
+	}
+	
+	public void setPossibleSolutionsMap(Map<String, ArrayList<Integer>> possibleSolutionsMap) {
+		this.possibleSolutionsMap = possibleSolutionsMap;
 	}
 	
 	public String[] getBox(String position){
@@ -203,13 +213,15 @@ public class Utils {
 	}
 	
 	public void createTreeOfSolutions() {
+		System.out.println("EMPTY pos before: "+board.getEmptyPositions());
 		possibleSolutionsMap = new HashMap<>();
+		
 		ArrayList<Integer> tempArray = new ArrayList<>();
 		for(int i = 0; i<9; i++) {
 			for(int j = 0; j<9; j++) {
 				if(board.getPositionValue(i, j)==(-1)) {
 					tempArray = this.getValuesAfterElimination(i, j);
-					//System.out.println("["+i+"]["+j+"]"+tempArray.toString());
+					System.out.println("["+i+"]["+j+"]"+tempArray.toString());
 					if(tempArray.size()==1) {
 						board.setBoardValue(i, j, tempArray.get(0));
 						board.reduceEmptyPositionCounter();
@@ -222,7 +234,8 @@ public class Utils {
 					
 			}
 		}
-		
+		System.out.println("POSSIBLE SOL SIZE: "+possibleSolutionsMap.size());
+		System.out.println("EMPTY pos after: "+board.getEmptyPositions());
 		
 	}
 	
@@ -356,7 +369,11 @@ public class Utils {
 			}
 		}
 
-	public void ultimateSolver() {
+	public boolean ultimateSolver() {
+		
+		System.out.println("SOLVING...");
+		currentUnsolved = board.getEmptyPositions();
+		boolean result = false;
 		createTreeOfSolutions();
 		for(int i =0; i<7;i+=3) {
 			for(int j = 0; j<7; j+=3) {
@@ -364,8 +381,68 @@ public class Utils {
 				//System.out.println(i+" "+j);
 			}
 		}
+		afterUnsolved = board.getEmptyPositions();
+		System.out.println("AFTER: " + afterUnsolved+" BEFORE: "+currentUnsolved);
+		if(currentUnsolved>afterUnsolved && currentUnsolved!=0) {
+			//System.out.println("AFTER: " + afterUnsolved+" BEFORE: "+currentUnsolved);
+			System.out.println("AFTER: " + afterUnsolved+" BEFORE: "+currentUnsolved);
+			counter++;
+			ultimateSolver();
+		}
+		if(afterUnsolved==0) {
+			result = true;
+		}
+		board.printBoard();
+		return result;
 		//System.out.println(board.returnEmptyPositionCounter());
 		//board.printBoard();
 		
+	}
+	
+	public ArrayList<String> getEasierToSolvePosition() {
+		int length = 9;
+		createTreeOfSolutions();
+		ArrayList<String> result = new ArrayList<>();
+		for(String key : possibleSolutionsMap.keySet()) {
+			if(possibleSolutionsMap.get(key).size()<length) {
+				length=possibleSolutionsMap.get(key).size();
+				result = new ArrayList<>();
+				result.add(key);
+			}else if (possibleSolutionsMap.get(key).size()==length) {
+				result.add(key);
+			}
+				
+		}
+		return result;
+	}
+	
+	public boolean search() {
+		Board boardCopy = new Board();
+		Utils utilsCopy = new Utils(boardCopy);
+		ArrayList<String> possibleKeys = getEasierToSolvePosition();
+		System.out.println(possibleKeys);
+		for(String key : possibleKeys) {
+			System.out.println("KEY: "+key);
+			for(int val : possibleSolutionsMap.get(key)) {
+				System.out.println("VAL: "+val);
+				
+				boardCopy.setBoard(board.getBoard());
+				boardCopy.printBoard();
+				boardCopy.setEmptyPositions(board.getEmptyPositions());
+				boardCopy.setBoardValue(Integer.parseInt(key.substring(0,1)), Integer.parseInt(key.substring(1)), val);
+				
+				utilsCopy.setPossibleSolutionsMap(possibleSolutionsMap);
+				boolean result = utilsCopy.ultimateSolver();
+				System.out.println("RESULT: "+result);
+				if(utilsCopy.ultimateSolver()) {
+					boardCopy.printBoard();
+					board = boardCopy;
+					return true;
+				}
+				System.out.println("COUNTER "+counter);
+			}
+		}
+		boardCopy.printBoard();
+		return false;
 	}
 }
